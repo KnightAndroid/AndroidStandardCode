@@ -57,6 +57,7 @@
     
    我们可以选择【Help】- 【Check for Updates...】进行查看对应版本更新
    ![](https://gitee.com/MengSuiXinSuoYuan/wanandroid_server/raw/master/AndroidStandardCode_picture/android_studio_checkupdates.png)
+   
    点击【Configure updatea】进行跟新配置，查看对应不同的版本
    ![](https://gitee.com/MengSuiXinSuoYuan/wanandroid_server/raw/master/AndroidStandardCode_picture/android_studio_channel.png)
  
