@@ -22,7 +22,14 @@
 
 ### 目录
 * [前言](#前言)
+* [基本规范](#基本规范)
 * [开发工具Android Studio规范](#开发工具AndroidStudio规范)
+* [APP包命名规范](#APP包命名规范)
+* [分包命名规范](#分包命名规范)
+* [模块命名规范](#模块命名规范)
+* [类命名规范](#类命名规范)
+* [接口规范](#接口规范)
+* [变量命名](#变量命名)
 
 #### 前言
    * 代码规范原则
@@ -45,7 +52,36 @@
        * **规范自己，榜样他人**
    对于有代码例子中，“说明”对代码进行了扩展和解释，“正例”意思是建议提倡这种编码方式；“反例”意思是错误的编码方式，不提倡甚至禁止这种编码习惯方式。
    
-#### 开发工具Android Studio规范 
+#### 基本规范
+* 删除无用变量，代码，无用的引入，禁用s1,s2,s3,y1这种命名
+* 代码尽量不要出现中文，注释除外，代码中通过`strings.xml`来引用显示中文
+* 布局文件中的字体大小，`margin`和`padding`的值也要放在`dimens.xml`中
+* 在一个`View.OnClickListener`中处理所有的点击事件逻辑，集中方便管理
+* `strings.xml`中使用`%1d`实现字符串的通配
+* TextView字体大小单位用sp，距离用dp
+* xml中用`layout_marginStart/End`来代替`layout_marginLeft/Right`，`padding`同理
+* 数据类型转换一定要加校验
+* 禁止在四大组件(Activity，Service，BroadcastReceiver，ContentProvider)中主线程做耗时操作
+* 注册反注册要成对出现(Eventbus,广播)
+* 资源对象不再使用时要及时关闭(Cursor,文件流,Bitmap,视频)，当确保不在使用这些资源时，必须关闭，否在会引起泄漏(Cursor.close(),BufferefReader.close()，Bitmap.recycle())。**注意：在 2.3.3 及以下需要调用 recycle()函数，在 2.3.3 以上 GC 会自动管理**
+    ```
+    if (Build.VERSION.SDK_INT <= 10) {
+        bitmap.recycle();
+    }
+    bitmap = null;
+    ```
+* 禁止在非UI线程(一般指主线程)进行view的相关操作
+* 不要通过Intent在基础组件传递大数据(binder transaction 缓存为1MB)
+* 操作本地数据库放在子线程中去，多线程写入数据库时，需要使用事务，以免出现同步问题
+* 使用png或者jpg图片时，一定要自己先使用压缩工具(tinypng)去进行压缩处理
+* 不要把敏感信息打印到log中，线上一定关闭所有log输出
+* 用`equals`方法时，用`xxxx.equals(object)`，不用`object.equals(xxxx)`，因为object对象有可能为空，导致空指针异常
+* 一个类不被继承时，要用final来修饰
+* 看情况来用访问修饰符`public,private,protect`，如：一个字段或者方法不需要被外部访问，用`private`修饰
+* 应用的图标放在**mipmap**目录下，其他图片资源放在`drawable`目录下
+
+
+#### 开发工具AndroidStudio规范 
 因为目前都是使用Android Studio来进行开发安卓开发，所以工具基于Android Studio来说明。
 
 * 【强制】使用稳定的Android Studio版本进行开发，Android Studio会有四个版本分别是：
@@ -82,6 +118,244 @@ kotlin设置**Use single name import**即可，Android Studio默认就是这个�
 * 【强制】必须安装[阿里巴巴代码](https://plugins.jetbrains.com/plugin/10046-alibaba-java-coding-guidelines)约束插件
 ![](https://gitee.com/MengSuiXinSuoYuan/wanandroid_server/raw/master/AndroidStandardCode_picture/android_studio_alibabaplugins.png)
 到这里开发工具就设置完毕。
+
+#### APP包命名规范
+* 【强制】全部小写，以防止和类名、接口名冲突，若有多个单词则直接连接在一起，不能有下划线
+    * 符合规范的示例：`com.example.deepspace`
+    * 不符合规范的示例：`com.wxample.deepSpace`、`com.example.deep_space`
+    
+* 【强制】包名前缀必须是能区分一个组织的顶级域名，倒叙写，比如`com.apple`   
+
+* 【强制】包名子路径不能包含java关键词，比如int、protect。
+
+#### 分包命名规范
+一个项目肯定会分很多的包，不可能把全部文件放在一个包下，分包是为了**统一管理项目文件**。
+* 【推荐】按功能或者作用进行分包，如：utils(工具)、widget(组件)、adapter(适配器)，按功能分包容易找到对应的类位置、容易管理、高度抽象、更容易封装。
+
+* 【强制】不要在对应包名放无关的类或者不属于这个包下的类
+#### 模块命名规范
+很多时候app会分很多模块，这些模块命名必须简单易懂。
+* 【强制】不能有大写中文，全部小写英文
+```
+base
+home
+live
+database
+```
+
+* 【强制】模块混淆配置，不使用`proguardFiles`语句，使用`consumerProguardFiles`,理由如下：
+    * `consumerProguardFiles`下的proguard会被打进aar包中，而`proguardFiles`配置的proguard不会被打进aar中。
+    * `proguardFiles`下的proguard文件只作用于库文件代码，只在编译发布aar的时候有用，在将库文件作为模块添加到App模块中，库文件的`consumerProguardFiles`配置的proguard文件则会追加到App模块的proguard配置文件中，作用于整个app。
+
+```
+buildTypes {
+    release {
+        //反例
+        //proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        //正例
+        consumerProguardFiles 'proguard-rules.pro'
+    }
+}
+```
+
+* 【推荐】增加资源命名前缀限制，为了避免模块间资源合并冲突，可以用模块名或者功能作为前缀
+```
+ android {
+    //限定资源前缀命名
+    resourcePrefix "wechat_"
+ }
+```
+
+#### 类命名规范
+* 【强制】 类名必须按照`UperCamelCase`(大驼峰)风格类命名，避免单词缩写
+
+    * 业务类：按照**模块+类型**进行命名
+    * 技术类：按照**作用+类型**进行命名
+|   类  |  描述 | 例子 |
+| :-----: | :----: | :----: |
+|  基础类 |  Base + 类型 | BaseActivity<br>BaseFragment
+|  Activity 类 |  界面+Activity | HomeActivity
+|  Fragment类|  界面+Fragment | HomeFragment
+|  自定义View |  功能+View/ViewGroup(组件类型) | CircleView/ShapeViewGroup
+|  Adapter类 |  功能+Adapter | ShoeDetailAdapter
+|  工具类 |  功能+Utils | LogUtils(日志类)<br>GsonUtils(json解析类)<br>ThreadPoolUtils(线程类)
+|  抽象类 |  Abstract+类型 | AbstractCircleView<br>AbstractTest
+|  异常类 |  异常类型+Exception | NullPointerException(空指针异常)<br>ArithmeticException(运算错误异常)
+|  接口类 |  功能(业务模块)+Interface<br>功能+Listener | UserInterface<br>OcrTextInterface<br>OnClickListener
+|  接口实现类 |  功能(业务模块)+InterfaceImpl | UserInterfaceImpl<br>OcrTextInterfaceImpl
+
+#### 接口规范
+* 【推荐】如果功能比较简单，单用在某个类伤，接口可以写在内部，如果方法功能比较多，建议抽取写成外部，如：
+```
+public class TextClickUtils {
+
+    public interface OnClickToWebListener{
+        void goWeb();
+    }
+
+    private OnClickToWebListener mOnClickToWebListener;
+
+    public void setOnClickWebListener(OnClickToWebListener mOnClickToWebListener){
+         this.mOnClickToWebListener = mOnClickToWebListener;
+    }
+}
+
+```
+```
+public interface OnHttpListener<T> {
+    /**
+     * 请求开始
+     */
+    default void onStart(Call call) {}
+
+    /**
+     * 请求成功
+     */
+    void onSucceed(T result);
+
+    /**
+     * 请求出错
+     */
+    void onFail(Exception e);
+
+    /**
+     * 请求结束
+     */
+    default void onEnd(Call call) {}
+}
+```
+
+* 【推荐】接口实现的类所实现方法要有@link
+
+```
+public class HttpCallback<T> implements OnHttpListener<T>,OnDownloadListener {
+
+    /**
+     * {@link OnHttpListener}
+     * @param call
+     */
+    @Override
+    public void onStart(Call call) {
+ 
+    }
+
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public void onSucceed(T result) {
+ 
+    }
+
+    @Override
+    public void onFail(Exception e) {
+
+    }
+
+    @Override
+    public void onEnd(Call call) {
+
+    }
+
+    /**
+     * {@link OnDownloadListener}
+     * @param file
+     */
+    @Override
+    public void onStart(File file) {
+
+    }
+
+    @Override
+    public void onProgress(File file, int progress) {
+
+    }
+
+    @Override
+    public void onComplete(File file) {
+
+    }
+
+    @Override
+    public void onError(File file, Exception e) {
+
+    }
+
+    @Override
+    public void onEnd(File file) {
+
+    }
+}
+```
+方便快速找到接口类的位置
+
+#### 变量命名
+变量包括了常量、局部变量、全局变量，统一规则：
+
+* 是名词或者动词类型，禁止拼音和英文混合方式
+* 变量按照`lowerCamelCase`风格,必须遵从小驼峰形式
+* 常量命名全部大写，单词间用下划线隔开，为了意思表达完整，不要嫌弃名字过长
+* 局部变量或者公开的成员变量以作用来命名。如：
+```
+public String mobile
+public TextView mobileTextView
+public LinearLayout mobileLinearLayout
+```
+* 【推荐】非公开的成员变量以小`m`开头，统一
+```
+private String mMobile
+private TextView mMobileTextView
+private LinearLayout mMobileLinearLayout
+```
+* 【强制】布尔值命名规范，不要在前缀加is，部分框架解析会引起序列化错误(com.alibaba.fastjson.util.TypeUtils.computeGetters有对is开头的方法进行处理)
+```
+//反例
+private boolean isPrintLog
+//正例
+private boolean printLog
+```
+* 【推荐】静态变量则用小s开头，统一
+```
+private static ProxySelector mProxySelector 
+```
+
+
+|   类型  |  描述 | 例子 |
+| :-----: | :----: | :----: |
+|  常量 |  大写或者与`_`混合,kotlin一定要 const val,Java 要用 static final 修饰 | const val MAX_STOCK_COUNT = 5<br>static final MAX_STOCK_COUNT = 5 
+|  变量 |  遵从`lowerCamelCase` | private boolean mDestroyed<br> var doorNumber:Int = 5
+|  临时变量 |  整型：`i,j,k` | for (int i = 0; i < len; i++) 
+
+**注意：Kotlin中只读变量用`val`，可变变量用`var`**
+
+* 【推荐】若一个类中有常量或者变量的时候，声明常量在前，变量在后，如：
+```
+public class DemoTest {
+    /*
+     * 注释....
+     */ 
+    public static final int RESULT_CANCELED    = 0;
+    /*
+     * 注释....
+     */ 
+    private int mTitleColor = 0;
+}
+```
+* 【强制】 在long或者Long赋值时，数值后使用的大写L，不能是小写的l，小写容易跟数字1混淆，造成误解
+如：
+```
+//反例
+Long a = 2l,//不知道是21还是2
+
+//正例
+Long number = 2L;
+```
+
+* 【推荐】 不要使用一个常量类维护所有常量，要按功能去进行分类，分开管理，放在一个类中，日而久之，杂乱无章，不利于理解和维护
+
+ #### 参考文章
+* [https://google.github.io/styleguide/javaguide.html](https://google.github.io/styleguide/javaguide.html)
+
+
 ## License
 
 ```text
