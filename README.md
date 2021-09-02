@@ -361,7 +361,7 @@ public class DemoTest {
     /*
      * 注释....
      */ 
-    public static final int RESULT_CANCELED    = 0;
+    public static final int RESULT_CANCELED = 0;
     /*
      * 注释....
      */ 
