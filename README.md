@@ -874,7 +874,7 @@ float mSpacingMult = mNamelayout.getSpacingMultiplier()
 ```
 
 #### so库命名规范
-很多时候APP有用到`so`(lib包目录下`armeabi-v7a`,`arm64-v8a`下的so结尾)库，以`lib+模块+作用`命名方式，小写英文，如：
+如果自己开发`so`(lib包目录下`armeabi-v7a`,`arm64-v8a`下的so结尾)库，以`lib+模块+作用`命名方式，小写英文，如：
 ```
 liblivevideo.so
 libchat.so
