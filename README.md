@@ -52,6 +52,8 @@
     * [类成员顺序规范](#类成员顺序规范)
 * [依赖第三方库规范](#依赖第三方库规范)
 * [异常捕抓规范](#异常捕抓规范)
+* [so库命名规范](#so库命名规范)
+* [jar包命名规范](#jar包命名规范)
 * [参考文章](#参考文章)
 
 #### 前言
@@ -74,6 +76,8 @@
        * **追求卓越工匠精神，打磨精品代码**
        * **规范自己，榜样他人**
    对于有代码例子中，“说明”对代码进行了扩展和解释，“正例”意思是建议提倡这种编码方式；“反例”意思是错误的编码方式，不提倡甚至禁止这种编码习惯方式。
+
+**注意：本规范只是提供参考，并且参考了部分网上博文规范，在末尾已列出**
    
 #### 基本规范
 * 删除未使用的局部变量、方法参数、私有方法、字段和多余的括号，无用的引入，禁用s1,s2,s3,y1这种命名
@@ -869,10 +873,33 @@ if (mNamelayout == null) {
 float mSpacingMult = mNamelayout.getSpacingMultiplier()
 ```
 
+#### so库命名规范
+很多时候APP有用到`so`(lib包目录下`armeabi-v7a`,`arm64-v8a`下的so结尾)库，以`lib+模块+作用`命名方式，小写英文，如：
+```
+liblivevideo.so
+libchat.so
+libmessageflutter.so
+```
+
+#### jar包命名规范
+很多时候APP有用到`so`(lib包目录下的jar包)库，以`模块+作用+b版本号`命名方式，中间以`_`隔开，禁止英文拼音结合，如：
+```
+wechatzxing_1.0.0.jar
+squareshare_1.0.0.jar
+messagedownload_1.0.0.jar
+```
+
  #### 参考文章
+* [https://github.com/getActivity/AndroidCodeStandard](https://github.com/getActivity/AndroidCodeStandard)
+* [https://mp.weixin.qq.com/s/IOR1911jtyQfeUOKIwEUwA](https://mp.weixin.qq.com/s/IOR1911jtyQfeUOKIwEUwA)
 * [https://google.github.io/styleguide/javaguide.html](https://google.github.io/styleguide/javaguide.html)
 * [https://github.com/android/architecture-samples](https://github.com/android/architecture-samples)
 * [https://source.android.com/source/code-style](https://source.android.com/source/code-style)
+* 阿里巴巴Android开发规范
+
+#### 最后
+如有更好的规范、其他建议、本规范错误地方，欢迎提`issue`。
+
 
 ## License
 
