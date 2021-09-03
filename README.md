@@ -882,7 +882,7 @@ libmessageflutter.so
 ```
 
 #### jar包命名规范
-很多时候APP有用到`so`(lib包目录下的jar包)库，以`模块+作用+b版本号`命名方式，中间以`_`隔开，禁止英文拼音结合，如：
+当APP有用到`jar`包，以`模块+作用+b版本号`命名方式，中间以`_`隔开，禁止英文拼音结合，如：
 ```
 wechatzxing_1.0.0.jar
 squareshare_1.0.0.jar
