@@ -29,10 +29,11 @@
 * [模块命名规范](#模块命名规范)
 * [类命名规范](#类命名规范)
 * [接口规范](#接口规范)
+* [常量命名规范](#常量命名规范)
 * [变量命名规范](#变量命名规范)
 * [方法命名规范](#方法命名规范)
 * [资源命名规范](#资源命名规范)
-    * [布局资源文件命名规范](#布局资源文件命名规范)
+    * [资源布局文件命名规范](#资源布局文件命名规范)
     * [图片资源文件命名规范](#图片资源文件命名规范)
     * [图片样式文件命名规范](#图片样式文件命名规范)
     * [String命名规范](#String命名规范)
@@ -49,9 +50,11 @@
     * [方法内注释规范](#方法内注释规范)
 * [代码样式规范](#代码样式规范)
     * [代码换行规范](#代码换行规范)
+    * [for循环规范](#for循环规范)
     * [类成员顺序规范](#类成员顺序规范)
 * [依赖第三方库规范](#依赖第三方库规范)
 * [异常捕抓规范](#异常捕抓规范)
+* [TODO规范](#TODO规范)
 * [so库命名规范](#so库命名规范)
 * [jar包命名规范](#jar包命名规范)
 * [参考文章](#参考文章)
@@ -81,6 +84,9 @@
    
 #### 基本规范
 * 删除未使用的局部变量、方法参数、私有方法、字段和多余的括号，无用的引入，禁用s1,s2,s3,y1这种命名
+* 拆分臃肿方法，确保每个方法只做一件事，单一职责
+* 方法之间必须有空行
+* 任何地方不要拼错单词
 * 代码尽量不要出现中文，注释除外，代码中通过`strings.xml`来引用显示中文
 * 布局文件中的字体大小，`margin`和`padding`的值也要放在`dimens.xml`中
 * 在一个`View.OnClickListener`中处理所有的点击事件逻辑，集中方便管理
@@ -98,9 +104,12 @@
     bitmap = null;
     ```
 * 禁止在非UI线程(一般指主线程)进行view的相关操作
+* 在`View`中的`onDraw`方法尽可能少频繁创建对象
+* 合理布局，有效运用`<merge>`、`<ViewStub>`、`<include>`标签
 * 不要通过Intent在基础组件传递大数据(binder transaction 缓存为1MB)
 * 操作本地数据库放在子线程中去，多线程写入数据库时，需要使用事务，以免出现同步问题
 * 使用png或者jpg图片时，一定要自己先使用压缩工具(tinypng)去进行压缩处理
+* 考虑使用`Webp`格式代替`png`格式的图片
 * 不要把敏感信息打印到log中，线上一定关闭所有log输出
 * 用`equals`方法时，用`xxxx.equals(object)`，不用`object.equals(xxxx)`，因为object对象有可能为空，导致空指针异常
 * 一个类不被继承时，要用final来修饰
@@ -110,6 +119,14 @@
 * 判断是否空集合用`Collection.isEmpty`比`Collection.size == 0`获得更好的性能，判断是否为`null`可以用`CollectionUtils.isEmpty(collection)`
 * 循环使用`StringBuilder`比`String`拼接，替换字符串更优
 * 工具类中屏蔽构造函数，一般来说工具类是一堆静态字段和函数的集合，其不应该被实例化
+* 文件、网络`IO`缓存，使用有缓存机制的输入流，如：
+```
+  BufferedInputStream替代InputStream
+  BufferedReader替代Reader
+  BufferedReader替代BufferedInputStream
+```
+* 使用JSON工具类，不要手动解析和拼装数据
+
 
 
 #### 开发工具AndroidStudio规范 
@@ -320,8 +337,39 @@ public class HttpCallback<T> implements OnHttpListener<T>,OnDownloadListener {
 ```
 方便快速找到接口类的位置
 
+#### 常量命名规范
+常量命名模式是`CONSTANT_CASE`,全部字母大写，用下划线分割单词，是名词或者动词类型，禁止拼音和英文混合方式，每个常量都是一个静态`final`字段，但不是所有静态`final`字段都是常量，决定一个字段是否常量时，考虑它的生命周期是否永远不变化，只有一直不变才标示是一个常量，例如：
+```
+// 常量
+static final int NUMBER = 5;
+static final ImmutableListNAMES = ImmutableList.of("Ed", "Ann");
+static final Joiner COMMA_JOINER = Joiner.on(','); // because Joiner is immutable
+static final SomeMutableType[] EMPTY_ARRAY = {};
+enum SomeEnum { ENUM_CONSTANT }
+
+// 不是常量
+static String nonFinal = "non-final";
+final String nonStatic = "non-static";
+static final SetmutableCollection = new HashSet();
+static final ImmutableSetmutableElements = ImmutableSet.of(mutable);
+static final Logger logger = Logger.getLogger(MyClass.getName());
+static final String[] nonEmptyArray = {"these", "can", "change"};
+```
+
+```
+//正例
+public static final int CAR_FRONT_LAMP = 2;
+//反例
+public static final int car_front_lamp = 2; 
+```
+**kotlin一定要 const val来定义**，如
+```
+const val MAX_STOCK_COUNT = 5
+```
+
+
 #### 变量命名规范
-变量包括了常量、局部变量、全局变量，统一规则：
+变量局部变量、全局变量，统一规则：
 
 * 是名词或者动词类型，禁止拼音和英文混合方式
 * 变量按照`lowerCamelCase`风格,必须遵从小驼峰形式
@@ -353,7 +401,6 @@ private static ProxySelector mProxySelector
 
 |   类型  |  描述 | 例子 |
 | :-----: | :----: | :----: |
-|  常量 |  大写或者与`_`混合,kotlin一定要 const val,Java 要用 static final 修饰 | const val MAX_STOCK_COUNT = 5<br>static final MAX_STOCK_COUNT = 5 
 |  变量 |  遵从`lowerCamelCase` | private boolean mDestroyed<br> var doorNumber:Int = 5
 |  临时变量 |  整型：`i,j,k` | for (int i = 0; i < len; i++) 
 
@@ -403,8 +450,10 @@ Long number = 2L;
 |  queryXXX() |  查询数据(queryLoginMessage) |
 
 #### 资源命名规范
-##### 布局文件命名规范
-* 【推荐】 **模块+类型**进行命名，采用下划线命名方式
+* 【强制】以名词或者动词类型，中间以`_`为分隔符，禁止拼音和英文混合方式
+
+##### 资源布局文件命名规范
+* 【推荐】**模块+作用+类型**进行命名，采用下划线命名方式，如：
 
 |   布局  |  例子 | 
 | :-----: | :----: | 
@@ -412,6 +461,8 @@ Long number = 2L;
 |  fragment |  home_fragment.xml |
 |  adapter |  home_articles_adapter.xml |
 |  dialog |  home_articles_dialog.xml |
+| popupWindow | home_messgae_pop |
+|  item | home_message_item |
 |  menu |  menu_item.xml |
 
 对`layout`可以进行分包处理，在`build.gradle`文件下配置,例子如下：
@@ -444,6 +495,23 @@ android {
 |  png |  wecaht_iv_share_link_ic.png(wechat模块下分享链接图标) |
 |  jpg |  message_tv_delete_ic.jpg(message模块下删除图标) |
 |  jpg |  message_rl_main_bg.jpg(message模块下主页的背景图片) |
+
+
+* 【推荐】如果有多种形态，如按钮选择器：`btn_xxx.xml`(selector)
+|   名称  | 说明 |
+| :-----: | :----: |
+|  btn_xx |  按钮图片使用`btn_整体效果`（selector） |
+|  btn_xx_normal |  分割线`控件_模块_颜色` |
+|  btn_xx_pressed |  按钮图片使用`btn_点击时候效果` |
+|  btn_xx_focused |  聚焦效果`state_focused` |
+|  btn_xx_disabled | (false)不可用效果 `state_enabled`  |
+|  btn_xx_checked |  选中效果`state_checked` |
+|  btn_xx_selected |  选中效果`state_selected` |
+|  bbtn_xx_hovered |  悬停效果`state_hovered` |
+|  btn_xx_checkable | 可选效果 `state_checkable` |
+|  btn_xx_activated | 激活的 `state_activated` |
+|  btn_xx_windowfocused |  state_window_focused |
+
 
 * 【推荐】如果是多个业务都用一个图标，或者和业务无相关，直接以**作用+类型**，采用下划线命名方式，如：
 
@@ -537,6 +605,33 @@ android {
 <!--通用分割线颜色-->
 <color name="common_line_color">#FFFFFFFF</color>
 ```
+
+* 【推荐】另外还有一种命名方式`以颜色值命名`，如：
+```
+<!-- grayscale -->
+<!--白-->
+<color name="white">#FFFFFF</color>
+<!--亮灰-->
+<color name="gray_light">#DBDBDB</color>
+<!--灰-->
+<color name="gray">#939393</color>
+<!--浅灰-->
+<color name="gray_dark">#5F5F5F</color>
+<!--黑-->
+<color name="black">#323232</color>
+
+<!-- basic colors -->
+<!--绿-->
+<color name="green">#27D34D</color>
+<!--蓝-->
+<color name="blue">#2A91BD</color>
+<!--橙-->
+<color name="orange">#FF9D2F</color>
+<!--红-->
+<color name="red">#FF432F</color>
+```
+命名可以在这个[https://www.matools.com/color/](https://www.matools.com/color/)获取
+
 
 * 【不推荐】 在实际过程中，会遇到下面这种命名方式，如：
 ```
@@ -754,7 +849,7 @@ if (xxx) {
 }
 ```
 
-* 【强制】每个判断语句都需要加左右括号
+* 【强制】每个判断语句都需要加左右括号，即便是只有一句
 ```
 //反例
 if () xxxx
@@ -805,6 +900,17 @@ Glide.with(context)
 
 * 【推荐】方法参数排序可以按照重要程度进行排序
 
+##### for循环规范
+* 【推荐】在不需要使用下标的情况下，建议使用for_each循环
+* 【强制】禁止在for循环的第二个条件中调用任何方法
+```
+ //反例：
+ for(int i =0;i < array.length;i++)
+ //正例
+ int size = array.length;
+ for(int i = 0; i< size;i++)
+
+```
 
 ##### 类成员顺序规范
 * 【推荐】类成员可以按照如下顺序
@@ -834,7 +940,9 @@ implementation "com.kingja.loadsir:loadsir:$loadsirVersion"
 * 【推荐】框架有问题时，及时联系库作者进行反馈
 
 #### 异常捕抓规范
+* 【强制】不要使用`try catch`处理业务逻辑
 * 【强制】不能为了减少`崩溃`而大量使用`try catch`,具体看需求看场景
+* 【强制】不要在循环中使用`try catch`，应该把其放在最外层
 * 【强制】必须捕获具体异常，不能用`Exception`来捕抓，并且在代码输出对应日志
 ```
 //反例
@@ -873,6 +981,11 @@ if (mNamelayout == null) {
 float mSpacingMult = mNamelayout.getSpacingMultiplier()
 ```
 
+#### TODO规范
+* 【推荐】记录想法，记录功能点，开发过程中可以利用`TODO`记录一下临时想法或为了不打扰思路留下待完善的说明
+* 【推荐】删除无用`TODO`，开发工具自动生成的`TODO`，或则已经完善的`TODO`，一定要删除
+
+
 #### so库命名规范
 如果自己开发`so`(lib包目录下`armeabi-v7a`,`arm64-v8a`下的so结尾)库，以`lib+模块+作用`命名方式，小写英文，如：
 ```
@@ -895,9 +1008,16 @@ messagedownload_1.0.0.jar
 * [https://google.github.io/styleguide/javaguide.html](https://google.github.io/styleguide/javaguide.html)
 * [https://github.com/android/architecture-samples](https://github.com/android/architecture-samples)
 * [https://source.android.com/source/code-style](https://source.android.com/source/code-style)
+* [https://github.com/QinGuiCheng/AndroidStandardDevelop](https://github.com/QinGuiCheng/AndroidStandardDevelop)
 * 阿里巴巴Android开发规范
 
 #### 最后
+* 好的规范能够提高代码质量，使得新人加入项目的时候降低理解代码的难度
+* 规矩规范终究是死的，适合团队的才是最好的
+* 规范需要团队一起齐心协力来维护执行，在团队生活里，谁都不可能独善其身
+* 一开始可能会有些不习惯，持之以恒，总会成功的
+
+
 如有更好的规范、其他建议、本规范错误地方，欢迎提`issue`。
 
 
