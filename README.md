@@ -86,6 +86,7 @@
    对于有代码例子中，“说明”对代码进行了扩展和解释，“正例”意思是建议提倡这种编码方式；“反例”意思是错误的编码方式，不提倡甚至禁止这种编码习惯方式。
    
 #### 基本规范
+* 禁止用中文定义类，常量，变量，方法名以及`key`
 * 删除未使用的局部变量、方法参数、私有方法、字段和多余的括号，无用的引入，禁用s1,s2,s3,y1这种命名
 * 拆分臃肿方法，确保每个方法只做一件事，单一职责
 * 方法之间必须有空行
@@ -94,7 +95,7 @@
 * 布局文件中的字体大小，`margin`和`padding`的值也要放在`dimens.xml`中
 * 在一个`View.OnClickListener`中处理所有的点击事件逻辑，集中方便管理
 * `strings.xml`中使用`%1d`实现字符串的通配
-* TextView字体大小单位用sp，距离用dp
+* 如没有特殊需求说明，TextView中设置字体大小单位统一用spp
 * xml中用`layout_marginStart/End`来代替`layout_marginLeft/Right`，`padding`同理
 * 数据类型转换一定要加校验
 * 禁止在四大组件(Activity，Service，BroadcastReceiver，ContentProvider)中主线程做耗时操作
