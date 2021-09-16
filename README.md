@@ -94,6 +94,14 @@
 #### 基本规范
 * 禁止用中文定义类，常量，变量，方法名以及`key`
 * 删除未使用的局部变量、方法参数、私有方法、字段和多余的括号，无用的引入，禁用s1,s2,s3,y1这种命名
+* 每次只声明一个变量，不要使用组合声明
+    ```
+    //反例
+    int minNumber,maxNumber
+    //正例
+    int minNumber;
+    int maxNumber;
+    ```
 * 拆分臃肿方法，确保每个方法只做一件事，单一职责
 * 方法之间必须有空行
 * 任何地方不要拼错单词
@@ -104,6 +112,7 @@
 * 如没有特殊需求说明，TextView中设置字体大小单位统一用spp
 * xml中用`layout_marginStart/End`来代替`layout_marginLeft/Right`，`padding`同理
 * 数据类型转换一定要加校验
+* 每个switch语句都包含一个default语句组，即使它什么代码也不包含
 * 禁止在四大组件(Activity，Service，BroadcastReceiver，ContentProvider)中主线程做耗时操作
 * 注册反注册要成对出现(Eventbus,广播)
 * 资源对象不再使用时要及时关闭(Cursor,文件流,Bitmap,视频)，当确保不在使用这些资源时，必须关闭，否在会引起泄漏(Cursor.close(),BufferefReader.close()，Bitmap.recycle())。**注意：在 2.3.3 及以下需要调用 recycle()函数，在 2.3.3 以上 GC 会自动管理**
@@ -137,7 +146,11 @@
   BufferedReader替代BufferedInputStream
 ```
 * 使用JSON工具类，不要手动解析和拼装数据
-
+* 尽量在合适的场合使用单例，使用单例可以减轻加载的负担、缩短加载的时间、提高加载的效率，但并不是所有地方都适用于单例，简单来说，进程中类只想有一个实例（对象）时，使用单例模式：
+    * 控制资源的使用，通过线程同步来控制资源的并发访问
+    * 控制实例的产生，以达到节约资源的目的
+    * 控制数据的共享，在不建立直接关联的条件下，让多个不相关的进程或线程之间实现通信
+* 使用 AS 自带的 Lint 来优化代码结构
 
 
 #### 开发工具AndroidStudio规范 
