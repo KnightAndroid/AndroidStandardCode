@@ -67,6 +67,12 @@
 * [TODO规范](#TODO规范)
 * [so库命名规范](#so库命名规范)
 * [jar包命名规范](#jar包命名规范)
+* [kotlin规范](kotlin规范)
+    * [基本规范](基本规范)
+    * [声明规范](声明规范)
+    * [源文件名称规范](源文件名称规范)
+    * [类头排版规范](类头排版规范)
+    * [格式化控制流语句规范](格式化控制流语句规范)
 * [参考文章](#参考文章)
 * [最后](#最后)
 
@@ -1075,6 +1081,127 @@ wechatzxing_1.0.0.jar
 squareshare_1.0.0.jar
 messagedownload_1.0.0.jar
 ```
+
+#### kotlin规范
+##### 基本规范
+* 在 Kotlin 中，分号是可选的，因此换行很重要
+* 不在`.`、`?.`、`::`左右留空格
+* 二元条件优先使用`if`而不是`when`，如果有三个或多个选项优先使用`when`
+    ```
+    //反例
+    when (x) {
+    null -> // ……
+    else -> // ……
+    }
+    
+    //正例
+    if (x == null) ....else....
+    ```
+* 如果需要在条件语句中用到可空的`Boolean`, 使用`if (value == true)`或`if (value == false)`检测
+* 当一个方法接受多个相同的原生类型参数带有参数默认值时，请使用具名参数语法， 除非在上下文中的所有参数的含义都已绝对清楚
+    ```
+    fun getOvalAreal(x:Int = 20,y:Int = 10,width:Int,height:Int,fill:Boolean = false):{
+    }
+    
+    getOvalAreal(x = 10, y = 10, width = 100, height = 100, fill = true)
+    
+    ```
+* 少写重载方法，多用具名函数，函数在重写的时候注意形参的参数名要一致  
+* 不要在主构造函数声明、方法声明或者方法调用的左括号之前留空格
+    ```
+    class A(val x: Int)
+    fun foo(x: Int) { …… }
+    fun bar() {
+        foo(1)
+    }
+    ```
+* 不要在用于标记可空类型的`?`前留空格：`String?`   
+* 在较长参数列表的左括号后添加一个换行符,按 4 个空格缩进参数,将密切相关的多个参数分在同一行,分隔参数名与值的 `=` 左右留空格
+    ```
+    drawSquare(
+        x = 10, y = 10,
+        width = 100, height = 100,
+        fill = true
+    )
+    ```
+*  当对链式调用换行时，将`.`字符或者`?.`操作符放在下一行，并带有缩进
+    ```
+    val anchor = owner
+        ?.firstChild!!
+        .siblings(forward = true)
+        .dropWhile { it is PsiComment || it is PsiWhiteSpace }
+    ```
+* 常量用`const`修饰(用`@JvmField`也可以)，`const`必须修饰`val`,不要以为用`val`修饰就是常量，如下面`currentTimeMillis`不是常量，因为每次访问`currentTimeMillis`都会改变
+    ```
+   //这不是常量
+   val currentTimeMillis: Long
+         get() { return System.currentTimeMillis() }
+    
+    ```
+    
+    
+##### 声明规范
+* 【强制】如果是可变变量，请用`var`修饰，如果是只读变量，请用`val`修饰
+    * 可变变量：可以进行修改
+    * 只读变量：当初始化一次后不能被二次改变
+
+* 【推荐】可见性方法修饰符除`public`外必须明确写出来(`kotlin`默认是public)
+    ```
+    //反例
+    fun startPreview()
+    //正例
+    private fun startPreview()
+    ```
+    
+##### 源文件名称规范
+如果 Kotlin 文件包含单个类（以及可能相关的顶层声明），那么文件名应该与该类的名称相同，并追加`.kt`扩展名。如果文件包含多个类或只包含顶层声明， 那么选择一个描述该文件所包含内容的名称，并以此命名该文件。 使用首字母大写的驼峰风格（也称为 Pascal 风格）， 例如`ProcessDeclarations.kt`
+
+##### 类头排版规范
+* 【推荐】有少数主构造函数参数的类可以写成一行
+    ```
+    class Person(id: Int, name: String)
+    ```
+* 【推荐】具有较长的类头的类进行格式化,每个函数参数占一行  
+    ```
+    class Person(
+    id: Int,
+    name: String,
+    surname: String
+    ) : Human(id, name) { /*……*/ }
+    ```
+* 【推荐】对于多个接口，应该将超类构造函数调用放在首位，然后将每个接口应放在不同的行中  
+    ```
+    class Person(
+    id: Int,
+    name: String,
+    surname: String
+    ) : Human(id, name),
+    KotlinMaker { /*……*/ }
+    ```
+##### 格式化控制流语句规范
+* 【推荐】在`when`语句中，如果一个分支不止一行，可以考虑用空行将其与相邻的分支块分开
+    ```
+    private fun parsePropertyValue(propName: String, token: Token) {
+    when (token) {
+        is Token.ValueToken ->
+            callback.visitValue(propName, token.value)
+        //空一行
+        Token.LBRACE -> { // ……
+        }
+      }
+    }
+    ```
+
+* 【推荐】在`when`语句中，如果有短分支，将短分支放在与条件相同的行上,无需花括号
+    ```
+    when (foo) {
+    true -> bar() // 正例
+    false -> { baz() } // 反例
+    }
+    ```
+
+
+
 
  #### 参考文章
 * [https://github.com/getActivity/AndroidCodeStandard](https://github.com/getActivity/AndroidCodeStandard)
