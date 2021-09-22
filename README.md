@@ -1084,7 +1084,7 @@ messagedownload_1.0.0.jar
 
 #### kotlin规范
 ##### kotlin基本规范
-* 在 Kotlin 中，分号是可选的，因此换行很重要
+* 在 Kotlin 中，分号是可选的，因此换行很重要,每句语句后都必须使用一个换行，不使用分号
 * 不在`.`、`?.`、`::`左右留空格
 * 二元条件优先使用`if`而不是`when`，如果有三个或多个选项优先使用`when`
     ```
@@ -1138,7 +1138,65 @@ messagedownload_1.0.0.jar
          get() { return System.currentTimeMillis() }
     
     ```
+ * 需要遍历数组时，优先使用`withIndex`和`indices`方式，这两种方式不会创建额外对象，而`forEach`，区间表达式和`step`这两种方式会创建额外对象
+     ```
+     for (index in array.indices) {
+     
+     }
+     for ((index, value) in array.withIndex()) {
+
+     }
+     ```
+   
+ * 尽量少用`toLowerCase`和`toUpperCase`方法，因为这两种方法会创建一个新的字符串出来进行比较，可以使用`equals`来代替并添加可选参数`ignoreCase`来忽略大小写
+     ```
+     xxx.equals(ssss,ignoreCase = true)
+     ```
+* 尽量不要使用`lateinit`来定义不可空类型的变量，可能会在使用时出现null的情况  
+* 读变量可以使用`by lazy { }`实现懒加载，并根据场合设置线程安全类型，UI线程建议设置为NONE
+    * `LazyThreadSafetyMode.NONE` 仅仅在单线程
+    * `LazyThreadSafetyMode.SYNCHRONIZED`在多线程中使用
+    * `LazyThreadSafetyMode.PUBLICATION`不常用
     
+  
+    ```
+    private val lazyImmutableValue: String by lazy {
+    "Hello"
+    }
+
+    private val lazyImmutableValueNoThreadSafe: String by lazy(LazyThreadSafetyMode.NONE) {
+    "Hello"
+    }
+
+    ```
+* 纯工具静态方法的使用，在类里的`companion object`中定义，会有额外开销，如不得不在伴生对象中实现静态方法，请添加`@JvmStatic`注解
+    ```
+    // 推荐	
+    // SimpleClass.kt
+    fun myUtilMethod() {
+    // Some things
+    }
+
+    // 不推荐
+    // SimpleClass.kt 
+    class SimpleClass {
+    companion object {
+	    fun myUtilMethod() {
+	    }
+    }
+    }
+
+    // 禁止
+    // SimpleClass.kt 
+    object SimpleClass {
+        fun myUtilMethod() {
+        }
+    }
+
+    ```
+    
+             
+   
     
 ##### 声明规范
 * 【强制】如果是可变变量，请用`var`修饰，如果是只读变量，请用`val`修饰
@@ -1192,15 +1250,16 @@ messagedownload_1.0.0.jar
     }
     ```
 
-* 【推荐】在`when`语句中，如果有短分支，将短分支放在与条件相同的行上,无需花括号
+* 【推荐】在`when`语句中和`if`语句中，如果有短分支(单行)，将短分支放在与条件相同的行上,无需花括号
     ```
     when (foo) {
     true -> bar() // 正例
     false -> { baz() } // 反例
     }
+    
+    if (string.isEmpty()) return
+    val value = if (a == b) 0 else 1
     ```
-
-
 
 
  #### 参考文章
