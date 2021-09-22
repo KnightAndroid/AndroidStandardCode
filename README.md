@@ -1084,7 +1084,7 @@ messagedownload_1.0.0.jar
 
 #### kotlin规范
 ##### kotlin基本规范
-* 在 Kotlin 中，分号是可选的，因此换行很重要,每句语句后都必须使用一个换行，不使用分号
+* 在 Kotlin 中，分号是可选的，因此换行很重要，每句语句后都必须使用一个换行，不使用分号
 * 不在`.`、`?.`、`::`左右留空格
 * 二元条件优先使用`if`而不是`when`，如果有三个或多个选项优先使用`when`
     ```
@@ -1097,7 +1097,7 @@ messagedownload_1.0.0.jar
     //正例
     if (x == null) ....else....
     ```
-* 如果需要在条件语句中用到可空的`Boolean`, 使用`if (value == true)`或`if (value == false)`检测
+* 如果需要在条件语句中用到可空的`Boolean`， 使用`if (value == true)`或`if (value == false)`检测
 * 当一个方法接受多个相同的原生类型参数带有参数默认值时，请使用具名参数语法， 除非在上下文中的所有参数的含义都已绝对清楚
     ```
     fun getOvalAreal(x:Int = 20,y:Int = 10,width:Int,height:Int,fill:Boolean = false):{
@@ -1116,7 +1116,7 @@ messagedownload_1.0.0.jar
     }
     ```
 * 不要在用于标记可空类型的`?`前留空格：`String?`   
-* 在较长参数列表的左括号后添加一个换行符,按 4 个空格缩进参数,将密切相关的多个参数分在同一行,分隔参数名与值的 `=` 左右留空格
+* 在较长参数列表的左括号后添加一个换行符，按 4 个空格缩进参数，将密切相关的多个参数分在同一行，分隔参数名与值的 `=` 左右留空格
     ```
     drawSquare(
         x = 10, y = 10,
@@ -1131,7 +1131,7 @@ messagedownload_1.0.0.jar
         .siblings(forward = true)
         .dropWhile { it is PsiComment || it is PsiWhiteSpace }
     ```
-* 常量用`const`修饰(用`@JvmField`也可以)，`const`必须修饰`val`,不要以为用`val`修饰就是常量，如下面`currentTimeMillis`不是常量，因为每次访问`currentTimeMillis`都会改变
+* 常量用`const`修饰(用`@JvmField`也可以)，`const`必须修饰`val`，不要以为用`val`修饰就是常量，如下面`currentTimeMillis`不是常量，因为每次访问`currentTimeMillis`都会改变
     ```
    //这不是常量
    val currentTimeMillis: Long
