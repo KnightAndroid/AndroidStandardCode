@@ -144,6 +144,16 @@
 * 判断是否空集合用`Collection.isEmpty`比`Collection.size == 0`获得更好的性能，判断是否为`null`可以用`CollectionUtils.isEmpty(collection)`
 * 循环使用`StringBuilder`比`String`拼接，替换字符串更优
 * 工具类中屏蔽构造函数，一般来说工具类是一堆静态字段和函数的集合，其不应该被实例化
+```
+public class MathUtils {
+    public static final double PI = 3.1415926D;
+    //需要加这一行
+    private MathUtils() {}
+    public static int sum(int a, int b) {
+        return a + b;
+    }
+}
+```
 * 调用工具类尽可能简单，如：`ToastUtils.show()`
 * 文件、网络`IO`缓存，使用有缓存机制的输入流，如：
 ```
@@ -157,6 +167,100 @@
     * 控制实例的产生，以达到节约资源的目的
     * 控制数据的共享，在不建立直接关联的条件下，让多个不相关的进程或线程之间实现通信
 * 使用 AS 自带的 Lint 来优化代码结构
+* 不要将数组声明为`public static final`因为这毫无意义，这样只是定义了引用为static final，数组的内容还是可以随意改变的，将数组声明为public更是一个安全漏洞，这意味着这个数组可以被外部类所改变
+* 使用同步代码块替代同步方法
+* 把一个基本数据类型转为字符串，`.toString()`是最快的方式、`String.valueOf`次之、数据`+`最慢
+    * `String.valueOf()`方法底层调用了Integer.toString()方法，但是会在调用前做空判断
+    * `Integer.toString()`方法就不说了，直接调用了
+    * `i + “”`底层使用了StringBuilder实现，先用append方法拼接，再用toString()方法获取字符串
+* 对资源的close()建议分开操作，虽然有些麻烦，却能避免资源泄露。我们想，如果没有修改过的代码，万一```XXX.close()```抛异常了，那么就进入了catch块中了，```YYY.close()```不会执行，YYY这块资源就不会回收了，一直占用着，这样的代码一多，是可能引起资源句柄泄露的。而改为下面的写法之后，就保证了无论如何XXX和YYY都会被close掉
+```
+try
+{
+  XXX.close();
+  YYY.close();
+}
+catch (Exception e)
+{
+  ...
+}
+
+//建议修改为：
+try
+{
+  XXX.close();
+}
+catch (Exception e)
+{
+  ...
+}
+try
+{
+  YYY.close();
+}
+catch (Exception e)
+{
+ ...
+}
+```
+
+* 静态类、单例类、工厂类将它们的构造函数置为`private`，这是因为静态类、单例类、工厂类这种类本来我们就不需要外部将它们new出来，将构造函数置为private之后，保证了这些类不会产生实例对象
+* 枚举的属性字段必须是私有不可变，枚举通常被当做常量使用，如果枚举中存在公共属性字段或设置字段方法，那么这些枚举常量的属性很容易被修改。理想情况下，枚举中的属性字段是私有的，并在私有构造函数中赋值，没有对应的 `Setter`方法，最好加上`final`修饰符
+```
+//反例
+public enum UserStatus {
+    DISABLED(0, "禁用"),
+    ENABLED(1, "启用");
+
+    public int value;
+    private String description;
+
+    private UserStatus(int value, String description) {
+        this.value = value;
+        this.description = description;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+}
+
+//正例
+public enum UserStatus {
+    DISABLED(0, "禁用"),
+    ENABLED(1, "启用");
+
+    private final int value;
+    private final String description;
+
+    private UserStatus(int value, String description) {
+        this.value = value;
+        this.description = description;
+    }
+
+    public int getValue() {
+        return value;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+}
+
+
+```
+* 小心`String.split(String regex)`，字符串String的`split`方法，传入的分隔字符串是正则表达式！部分关键字（比如`.[]()\|`等）需要转义
+```
+"a.ab.abc".split("."); // 结果为[]
+"a|ab|abc".split("|"); // 结果为["a", "|", "a", "b", "|", "a", "b", "c"]
+
+"a.ab.abc".split("\\."); // 结果为["a", "ab", "abc"]
+"a|ab|abc".split("\\|"); // 结果为["a", "ab", "abc"]
+```
 
 
 #### 开发工具AndroidStudio规范 
@@ -992,6 +1096,25 @@ for (int j = 0;j < 10000;j++) {
 
 ```
 
+* 【推荐】循环内不要不断创建对象引用
+```
+//反例
+for (int i = 1; i <= count; i++)
+{
+  Object obj = new Object();    
+}
+
+//正例
+Object obj = null;
+for (int i = 0; i <= count; i++)
+{
+  obj = new Object();
+}
+
+```
+这样的话，内存中只有一份Object对象引用，每次new Object()的时候，Object对象引用指向不同的Object罢了，但是内存中只有一份，这样就大大节省了内存空间了。
+
+
 ##### 类成员顺序规范
 * 【推荐】类成员可以按照如下顺序
     * 常量(Kotlin伴生对象要在开头)
@@ -1269,6 +1392,7 @@ messagedownload_1.0.0.jar
 * [https://github.com/android/architecture-samples](https://github.com/android/architecture-samples)
 * [https://source.android.com/source/code-style](https://source.android.com/source/code-style)
 * [https://github.com/QinGuiCheng/AndroidStandardDevelop](https://github.com/QinGuiCheng/AndroidStandardDevelop)
+* [https://www.cnblogs.com/myseries/p/10694246.html](https://www.cnblogs.com/myseries/p/10694246.html)
 * 阿里巴巴Android开发规范
 
 #### 最后
