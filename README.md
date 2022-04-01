@@ -65,6 +65,7 @@
 * [依赖第三方库规范](#依赖第三方库规范)
 * [异常捕抓规范](#异常捕抓规范)
 * [TODO规范](#TODO规范)
+* [FIXME规范](#FIXME规范)
 * [so库命名规范](#so库命名规范)
 * [jar包命名规范](#jar包命名规范)
 * [kotlin规范](#kotlin规范)
@@ -73,6 +74,7 @@
     * [源文件名称规范](#源文件名称规范)
     * [类头排版规范](#类头排版规范)
     * [格式化控制流语句规范](#格式化控制流语句规范)
+* [代码提交规范](#代码提交规范)    
 * [参考文章](#参考文章)
 * [最后](#最后)
 
@@ -99,6 +101,7 @@
    
 #### 基本规范
 * 禁止用中文定义类，常量，变量，方法名以及`key`
+* 代码中的命名均不能以下划线或美元符号开始，也不能以下划线或美元符号结束
 * 删除未使用的局部变量、方法参数、私有方法、字段和多余的括号，无用的引入，禁用s1,s2,s3,y1这种命名
 * 每次只声明一个变量，不要使用组合声明
     ```
@@ -143,6 +146,20 @@
 * 不要在**Application**对象中缓存数据(因为有可能会因系统内存不足而进行回收，但是这时候重新打开应用的时候，会创建一个新的Application对象，但是可能会启动回收前用户打开的界面，这样会造成缓存数据重新初始化，造成不可预期的结果)
 * 判断是否空集合用`Collection.isEmpty`比`Collection.size == 0`获得更好的性能，判断是否为`null`可以用`CollectionUtils.isEmpty(collection)`
 * 循环使用`StringBuilder`比`String`拼接，替换字符串更优
+* 注意Map类集合K/V能不能存储null值得情况,如下表格：
+|   集合类  |  Key | Value | Super | 说明 |
+| :-----: | :----: | :----: | :---:| :---: |
+|  Hashtable |  不允许为null | 不允许为null | Dictionary | 线程安全
+|  ConcurrentHashMap | 不允许为null | 不允许为null | AbstractMap | 分段锁技术
+|  TreeMap | 不允许为null | 允许为null | AbstractMap | 线程不安全 |
+|  HashMap | 允许为null | 允许为null | AbstractMap | 线程不安全 |
+
+* 如果使用到了设计模式，建议在类名中体现具体模式，如：
+```
+  public class ComponentFactory
+  public class BufferStrategy
+  public class ScrollerProxy
+```
 * 工具类中屏蔽构造函数，一般来说工具类是一堆静态字段和函数的集合，其不应该被实例化
 ```
 public class MathUtils {
@@ -274,31 +291,31 @@ public enum UserStatus {
     **建议：可以同时安装稳定版和金丝雀版本**。
     
    我们可以选择【Help】- 【Check for Updates...】进行查看对应版本更新
-   ![](https://gitee.com/MengSuiXinSuoYuan/wanandroid_server/raw/master/AndroidStandardCode_picture/android_studio_checkupdates.png)
+   ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/b5f155e30ee94ae4b291855414b511e4~tplv-k3u1fbpfcp-zoom-1.image)
    
    点击【Configure updatea】进行跟新配置，查看对应不同的版本
-   ![](https://gitee.com/MengSuiXinSuoYuan/wanandroid_server/raw/master/AndroidStandardCode_picture/android_studio_channel.png)
+   ![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/255366090be84d0fa0aff1ddc9f08d69~tplv-k3u1fbpfcp-zoom-1.image)
  
 * 【推荐】使用统一版本的Android Stuido进行开发，如：4.1.1
 * 【强制】使用统一的gradle构建工具版本，在项目根目录【gradle】-【gradle-wrapper.properties】进行设置
 * 【强制】使用统一的gradle插件版本配置，在项目根目录【build.gradle】下进行设置
 * 【强制】编码格式为UTF-8
-![](https://gitee.com/MengSuiXinSuoYuan/wanandroid_server/raw/master/AndroidStandardCode_picture/android_studio_filecode.png)
-![](https://gitee.com/MengSuiXinSuoYuan/wanandroid_server/raw/master/AndroidStandardCode_picture/android_studio_codesetting.png)
+![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/2f80bbc778014f03b29fe89bcc3d1a16~tplv-k3u1fbpfcp-zoom-1.image)
+![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/f861874b8d3441998e6fa6c23736023d~tplv-k3u1fbpfcp-zoom-1.image)
 * 【强制】删除多余的import,手动清除可以点击菜单栏【Code】-【Optmize Imports】,可以设置自动清除
-![](https://gitee.com/MengSuiXinSuoYuan/wanandroid_server/raw/master/AndroidStandardCode_picture/android_studio_cancelimport.png)
+![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/dd53c79adee444038b4ae04f37c55959~tplv-k3u1fbpfcp-zoom-1.image)
 * 【强制】禁止类文件中出现`import.*`,意思就是导入的类包必须是单路径引用，必须列出详细的import内容，可以设置下自动合并import的包名
-![](https://gitee.com/MengSuiXinSuoYuan/wanandroid_server/raw/master/AndroidStandardCode_picture/android_studio_changeimport.png)
+![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/b56389c512a4454e8e3796f157d029b5~tplv-k3u1fbpfcp-zoom-1.image)
 kotlin设置**Use single name import**即可，Android Studio默认就是这个选项
 
 * 【推荐】每行代码字符数不超过160个字符，在【Editor】-【Code Style】设置，Android Studio 默认就是这个字符数
-![](https://gitee.com/MengSuiXinSuoYuan/wanandroid_server/raw/master/AndroidStandardCode_picture/android_studio_codemax.png)
+![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/06033f32c49043dbbc22861da32f0e7b~tplv-k3u1fbpfcp-zoom-1.image)
 
 * 【强制】每个类必须带有版权信息，创建人信息，描述，对自己代码负责，可根据自己公司要求做出变化
-![](https://gitee.com/MengSuiXinSuoYuan/wanandroid_server/raw/master/AndroidStandardCode_picture/android_studio_filemessage.png)
+![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/0971a74f321e4a3dae5e2f156345692c~tplv-k3u1fbpfcp-zoom-1.image)
 
 * 【强制】必须安装[阿里巴巴代码](https://plugins.jetbrains.com/plugin/10046-alibaba-java-coding-guidelines)约束插件
-![](https://gitee.com/MengSuiXinSuoYuan/wanandroid_server/raw/master/AndroidStandardCode_picture/android_studio_alibabaplugins.png)
+![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/497af36365be4873906aedb8e1f36812~tplv-k3u1fbpfcp-zoom-1.image)
 到这里开发工具就设置完毕。
 
 #### APP包命名规范
@@ -618,7 +635,7 @@ android {
 }
 ```
 配置完编译一下，结构如下：
-![](https://gitee.com/MengSuiXinSuoYuan/wanandroid_server/raw/master/AndroidStandardCode_picture/android_studio_resource.png)
+![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/53fb09f4a84542869dbc61f3d6c5da32~tplv-k3u1fbpfcp-zoom-1.image)
 
 ##### 图片资源文件命名规范
 * 【推荐】如果是与业务相关的，直接以**模块(页面)+用作view的缩写+类型**，采用下划线命名方式，如：
@@ -920,13 +937,13 @@ versionName = "8.0.11"
 * 【推荐】每一个成员方法(自定义成员方法，覆盖方法，属性方法)的前面必须做好注释，默认是在方法前输入`/**+回车`即可出来。
 也可以自定义模板注释：
 * 首先创建`Template Group...`
-![](https://gitee.com/MengSuiXinSuoYuan/wanandroid_server/raw/master/AndroidStandardCode_picture/android_studio_annoation_one.png)
+![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/5091684735764e83856a84aab6ad971c~tplv-k3u1fbpfcp-zoom-1.image)
 * 接着创建`Live Template`
-![](https://gitee.com/MengSuiXinSuoYuan/wanandroid_server/raw/master/AndroidStandardCode_picture/android_studio_annoation_two.png)
+![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/222e73f207c84976827d2c15a9a439da~tplv-k3u1fbpfcp-zoom-1.image)
 * 在`Abbreviation` 输入快捷键，在`Template text`定义自己的注释
-![](https://gitee.com/MengSuiXinSuoYuan/wanandroid_server/raw/master/AndroidStandardCode_picture/android_studio_annoation_three.png)
+![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/7da6bbed773a47feb480989e925d4bd5~tplv-k3u1fbpfcp-zoom-1.image)
 * 因为模板里设置了日期时间，因此点击`Edit variables`需要给`date`和`time`赋值
-![](https://gitee.com/MengSuiXinSuoYuan/wanandroid_server/raw/master/AndroidStandardCode_picture/android_studio_annoation_four.png)
+![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/cf727a7834c14a1f9c2f5c8ffd29ce8d~tplv-k3u1fbpfcp-zoom-1.image)
 
 设置完模板后，新建一个方法，在方法前输入`ann`+回车即可出现方法模板注释
 
@@ -1188,6 +1205,8 @@ float mSpacingMult = mNamelayout.getSpacingMultiplier()
 * 【推荐】记录想法，记录功能点，开发过程中可以利用`TODO`记录一下临时想法或为了不打扰思路留下待完善的说明
 * 【推荐】删除无用`TODO`，开发工具自动生成的`TODO`，或则已经完善的`TODO`，一定要删除
 
+#### FIXME规范
+* 【推荐】若代码存在严重问题或仅用于调试，使用FIXME加以标记
 
 #### so库命名规范
 如果自己开发`so`(lib包目录下`armeabi-v7a`,`arm64-v8a`下的so结尾)库，以`lib+模块+作用`命名方式，小写英文，如：
@@ -1384,8 +1403,18 @@ messagedownload_1.0.0.jar
     val value = if (a == b) 0 else 1
     ```
 
+#### 代码提交规范
+* 【强制】每天上班前先更新代码
+* 【推荐】工作目录要及时更新，不要和服务起有太大的差别
+* 【强制】提交代码时，如果出现冲突，先仔细分析解决，不可以强行提交
+* 【强制】提交代码之前先在本地进行测试，确保项目能编译通过，且能够正常运行，不可盲目提交
+* 【强制】必须保证服务器上的版本是正确的，项目有错误时，不要进行提交
+* 【强制】提交之前先更新
+* 【强制】提交时注意不要提交本地自动生成的文件，如`idea`，`build`文件夹是不需要提交的
+* 【推荐】不要提交自己不明白的代码
+* 【推荐】对提交的信息采用明晰详细的标注(如改了什么...)
 
- #### 参考文章
+#### 参考文章
 * [https://github.com/getActivity/AndroidCodeStandard](https://github.com/getActivity/AndroidCodeStandard)
 * [https://mp.weixin.qq.com/s/IOR1911jtyQfeUOKIwEUwA](https://mp.weixin.qq.com/s/IOR1911jtyQfeUOKIwEUwA)
 * [https://google.github.io/styleguide/javaguide.html](https://google.github.io/styleguide/javaguide.html)
